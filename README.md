@@ -6,4 +6,4 @@
    ```javascript
    JSON.parse(unescape(document.cookie.split(";").map(pair => pair.trim().split("=")).find(item => item[0] === "BOSYUNCurrent")[1]))["refresh_token"]
    ```
-3. 将该token赋给constant.ts中的变量USER_TOKEN
+3. 将该token赋给.env的环境变量VITE_USER_TOKEN

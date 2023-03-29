@@ -1,6 +1,7 @@
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
-import {SERVER_ORIGIN} from './src/constant';
+
+const SERVER_ORIGIN = "https://pre.pixso.cn";
 
 // https://vitejs.dev/config/
 export default defineConfig({

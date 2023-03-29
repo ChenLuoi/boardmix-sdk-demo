@@ -2,6 +2,7 @@
 import {onMounted, ref} from "vue";
 import {sdkBoxHelper} from "./boardmix";
 import {Api} from "./request";
+import {SDK_ORIGIN} from "./constant";
 
 const isSdkPrepared = ref(false);
 
@@ -52,6 +53,9 @@ function reEnterFile() {
   sdkBoxHelper.fileKey = fileKey.value;
   startFile(fileKey.value, "editor");
 }
+
+const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
+
 </script>
 
 <template>
@@ -61,7 +65,7 @@ function reEnterFile() {
       <button v-if="!isWorking && fileKey" @click="reEnterFile">再次进入</button>
       <button v-if="isWorking" @click="exitFile">退出文件</button>
     </div>
-    <iframe ref="iframeEle" src="https://sdk-pre.boardmix.cn/app/sdk"/>
+    <iframe ref="iframeEle" :src="SDK_APP_PATH"/>
   </div>
 </template>
 

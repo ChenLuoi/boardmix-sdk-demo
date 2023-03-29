@@ -6,4 +6,6 @@
    ```javascript
    JSON.parse(unescape(document.cookie.split(";").map(pair => pair.trim().split("=")).find(item => item[0] === "BOSYUNCurrent")[1]))["refresh_token"]
    ```
-3. 将该token赋给.env的环境变量VITE_USER_TOKEN
+3. 复制.env中的环境变量配置，并创建.env.local配置文件（避免git提交）
+4. 将该token赋给.env.local的环境变量VITE_USER_TOKEN
+5. 如果有其他环境的配置需要，请修改.env.local中的VITE_SDK_ORIGIN和VITE_SERVER_ORIGIN，注意修改环境后，对应的token也需要重新生成并替换

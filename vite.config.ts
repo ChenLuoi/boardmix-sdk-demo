@@ -1,22 +1,29 @@
-import {defineConfig} from 'vite'
+import {defineConfig, loadEnv} from 'vite'
 import vue from '@vitejs/plugin-vue'
-
-const SERVER_ORIGIN = "https://pre.pixso.cn";
+import {viteHtmlVariables} from "./plugin/vite-html-variables";
 
 // https://vitejs.dev/config/
-export default defineConfig({
-    server: {
-        port: 8000,
-        proxy: {
-            "/api": {
-                target: SERVER_ORIGIN,
-                changeOrigin: true
-            },
-            "/openapi": {
-                target: SERVER_ORIGIN,
-                changeOrigin: true
+export default defineConfig((config) => {
+    const env = loadEnv(config.mode, process.cwd());
+    return {
+        server: {
+            port: 8000,
+            proxy: {
+                "/api": {
+                    target: env.VITE_SERVER_ORIGIN,
+                    changeOrigin: true
+                },
+                "/openapi": {
+                    target: env.VITE_SERVER_ORIGIN,
+                    changeOrigin: true
+                }
             }
-        }
-    },
-    plugins: [vue()]
-})
+        },
+        plugins: [
+            vue(),
+            viteHtmlVariables({
+                $SDK_ORIGIN: env.VITE_SDK_ORIGIN
+            })
+        ]
+    }
+});

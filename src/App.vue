@@ -65,7 +65,14 @@ function reEnterFile() {
   </div>
 </template>
 
-<style scoped>
+<style>
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .container {
   position: absolute;
   left: 0;

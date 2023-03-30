@@ -18,7 +18,8 @@ onMounted(async () => {
   // iframe页面准备好后的回调
   sdkBoxHelper.on("PAGE_PREPARED", () => {
     isSdkPrepared.value = true;
-  })
+  });
+  refreshFileList();
 })
 
 function startFile(fileKey: string, role: "editor" | "viewer") {
@@ -36,13 +37,16 @@ function startFile(fileKey: string, role: "editor" | "viewer") {
 
 function exitFile() {
   // 发送消息退出文件
-  sdkBoxHelper.sendMessage("STOP_LOADING");
-  isWorking.value = false;
+  if (isWorking.value) {
+    sdkBoxHelper.sendMessage("STOP_LOADING");
+    isWorking.value = false;
+  }
 }
 
 async function onCreateFile() {
   // 其他接入方创建文件接口，请勿参考
   const file = await Api.createFile();
+  await refreshFileList()
   fileKey.value = file.file_key;
   sdkBoxHelper.fileKey = file.file_key;
   startFile(file.file_key, "editor");
@@ -54,6 +58,18 @@ function reEnterFile() {
   startFile(fileKey.value, "editor");
 }
 
+const fileList = ref<{ file_key: string, name: string }[]>([])
+
+async function refreshFileList() {
+  fileList.value = await Api.getFileList();
+}
+
+function onSelect(ev: Event) {
+  exitFile();
+  fileKey.value = (ev.target as HTMLSelectElement).value;
+  reEnterFile();
+}
+
 const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
 
 </script>
@@ -61,6 +77,15 @@ const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
 <template>
   <div class="container">
     <div class="action-group">
+      <select v-model="fileKey" @change="onSelect">
+        <option
+            v-for="file in fileList"
+            :key="file.file_key"
+            :value="file.file_key"
+        >
+          {{ file.name }}
+        </option>
+      </select>
       <button v-if="!isWorking" @click="onCreateFile">创建文件</button>
       <button v-if="!isWorking && fileKey" @click="reEnterFile">再次进入</button>
       <button v-if="isWorking" @click="exitFile">退出文件</button>

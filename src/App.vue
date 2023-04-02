@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {sdkBoxHelper} from "./boardmix";
-import {Api} from "./request";
-import {SDK_ORIGIN} from "./constant";
+import { onMounted, ref } from "vue";
+import { sdkBoxHelper } from "./boardmix";
+import { Api } from "./request";
+import { SDK_ORIGIN } from "./constant";
 
 const isSdkPrepared = ref(false);
 
@@ -12,7 +12,7 @@ const fileKey = ref("");
 
 onMounted(async () => {
   // sdkHelper绑定iframe
-  sdkBoxHelper.bindIframe(iframeEle.value)
+  sdkBoxHelper.bindIframe(iframeEle.value);
   // 其他介入方接口，请勿参考
   await Api.getAccessToken();
   // iframe页面准备好后的回调
@@ -20,7 +20,7 @@ onMounted(async () => {
     isSdkPrepared.value = true;
   });
   refreshFileList();
-})
+});
 
 function startFile(fileKey: string, role: "editor" | "viewer") {
   if (!isSdkPrepared.value) {
@@ -31,8 +31,8 @@ function startFile(fileKey: string, role: "editor" | "viewer") {
   // 发送消息启动文件
   sdkBoxHelper.sendMessage("START_LOADING", {
     fileKey: fileKey,
-    role
-  })
+    role,
+  });
 }
 
 function exitFile() {
@@ -46,7 +46,7 @@ function exitFile() {
 async function onCreateFile() {
   // 其他接入方创建文件接口，请勿参考
   const file = await Api.createFile();
-  await refreshFileList()
+  await refreshFileList();
   fileKey.value = file.file_key;
   sdkBoxHelper.fileKey = file.file_key;
   startFile(file.file_key, "editor");
@@ -58,7 +58,7 @@ function reEnterFile() {
   startFile(fileKey.value, "editor");
 }
 
-const fileList = ref<{ file_key: string, name: string }[]>([])
+const fileList = ref<{ file_key: string; name: string }[]>([]);
 
 async function refreshFileList() {
   fileList.value = await Api.getFileList();
@@ -71,31 +71,41 @@ function onSelect(ev: Event) {
 }
 
 const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
-
 </script>
 
 <template>
   <div class="container">
     <div class="action-group">
-      <select v-model="fileKey" @change="onSelect">
+      <select
+        v-model="fileKey"
+        @change="onSelect">
         <option
-            v-for="file in fileList"
-            :key="file.file_key"
-            :value="file.file_key"
+          v-for="file in fileList"
+          :key="file.file_key"
+          :value="file.file_key"
         >
           {{ file.name }}
         </option>
       </select>
-      <button v-if="!isWorking" @click="onCreateFile">创建文件</button>
-      <button v-if="!isWorking && fileKey" @click="reEnterFile">再次进入</button>
-      <button v-if="isWorking" @click="exitFile">退出文件</button>
+      <button
+        v-if="!isWorking"
+        @click="onCreateFile">创建文件</button>
+      <button
+        v-if="!isWorking && fileKey"
+        @click="reEnterFile">
+        再次进入
+      </button>
+      <button
+        v-if="isWorking"
+        @click="exitFile">退出文件</button>
     </div>
-    <iframe ref="iframeEle" :src="SDK_APP_PATH"/>
+    <iframe
+      ref="iframeEle"
+      :src="SDK_APP_PATH" />
   </div>
 </template>
 
 <style>
-
 body {
   width: 100vw;
   height: 100vh;

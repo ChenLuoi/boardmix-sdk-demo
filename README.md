@@ -1,4 +1,4 @@
-# boardmix sdk demo
+# b.prettierrcoardmix sdk demo
 
 ## 运行准备
 1. 打开[pixso应用](https://pre.pixso.cn/app/)，注册账号并进入应用

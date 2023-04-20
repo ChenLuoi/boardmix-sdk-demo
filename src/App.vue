@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { sdkBoxHelper } from "./boardmix";
-import { SDK_ORIGIN } from "./constant";
+import { SDK_BASE } from "./constant";
 import { ServerInstance } from "./server";
 
 const isSdkPrepared = ref(false);
@@ -110,7 +110,7 @@ function onSelect(ev: Event) {
   reEnterFile();
 }
 
-const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
+const SDK_APP_PATH = `${SDK_BASE}/app/sdk`;
 </script>
 
 <template>

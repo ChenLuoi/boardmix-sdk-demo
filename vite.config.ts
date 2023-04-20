@@ -7,7 +7,7 @@ export default defineConfig((config) => {
   const env = loadEnv(config.mode, process.cwd());
   return {
     server: {
-      port: 28000,
+      port: 23333,
       proxy: {
         "/api": {
           target: env.VITE_PIXSO_ORIGIN,
@@ -23,6 +23,7 @@ export default defineConfig((config) => {
       vue(),
       viteHtmlVariables({
         $SDK_ORIGIN: env.VITE_SDK_ORIGIN,
+        $SDK_BASE: env.VITE_SDK_BASE,
       }),
     ],
   };

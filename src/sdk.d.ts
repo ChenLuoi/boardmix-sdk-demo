@@ -4,33 +4,38 @@ declare type SdkEventBoxToApp =
   | "STOP_LOADING"
   | "SET_ACCESS_TOKEN"
   | "SET_USER_INFO";
-declare type SdkEventAppToBox =
-  | "PAGE_PREPARED" // boardmix应用已准备完成，可以开始进行文件加载
-  | "GET_ACCESS_TOKEN" // boardmix请求获取access_token
-  | "GET_USER_INFO" // boardmix请求获取当前用户信息
-  | "GET_FILE_INFO" // boardmix请求获取当前文件信息
-  | "UPDATE_FILE_NAME" // boardmix侧用户修改了文件名称，发送事件请求更新
-  | "UPDATE_FILE_COVER" // boardmix侧用户修改了文件封面，发送事件请求更新
-  | "UPDATE_FILE_THUMBNAIL" // boardmix侧缩略图变更，发送事件请求更新
-  | "BACK_TO_HOME" // boardmix侧用户点击返回，发送事件请求退出页面
-  | "START_SHARE" // boardmix侧用户点击分享按钮，发送事件请求
-  | "REPORT_USER_ACTIVE"
-  | "SHARE_WITH_NODE" // boardmix侧用户分享指定图元，发送事件请求
-  | "REQUEST_LOGIN" // 特定情况下，用户未登录访问，用户点击登录按钮
-  | "GET_FILE_USERS"; // 部分功能需要关联用户列表，boardmix发送事件请求对应数据
-declare abstract class SdkBase {
-  public on(event: string, handler: Func);
 
-  public once(event: string, handler: Func);
+type SdkAppEventParams = {
+  PAGE_PREPARED: void;
+  GET_ACCESS_TOKEN: void;
+  GET_USER_INFO: void;
+  GET_FILE_INFO: void;
+  UPDATE_FILE_NAME: void;
+  UPDATE_FILE_COVER: void;
+  UPDATE_FILE_THUMBNAIL: void;
+  BACK_TO_HOME: void;
+  START_SHARE: void;
+  REPORT_USER_ACTIVE: void;
+  SHARE_WITH_CODE: { nodeId: string };
+  REQUEST_LOGIN: void;
+  GET_FILE_USERS: void;
+};
 
-  public off(event: string, handler: Func);
+declare type SdkEventAppToBox = keyof SdkAppEventParams;
 
-  public removeAllListener(event: string);
+declare abstract class SdkBase<T extends keyof SdkAppEventParams> {
+  public on(event: T, handler: (params: SdkAppEventParams[T]) => void);
 
-  public emit(event: string, ...args: any[]);
+  public once(event: T, handler: (params: SdkAppEventParams[T]) => void);
+
+  public off(event: T, handler: (params: SdkAppEventParams[T]) => void);
+
+  public removeAllListener(event: T);
+
+  public emit(event: T, params: SdkAppEventParams[T]);
 }
 
-declare abstract class BoardMixSdk extends SdkBase {
+declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
   constructor(origin: string, option: SdkBoxOption);
 
   public bindIframe(iframeEle: HTMLIFrameElement): void;

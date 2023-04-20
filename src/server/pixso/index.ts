@@ -1,5 +1,5 @@
 import axios from "axios";
-import { USER_TOKEN } from "./constant";
+import { PIXSO_TOKEN } from "../../constant";
 
 let accessToken = "";
 let myFolderId = 0;
@@ -51,17 +51,16 @@ const InnerApi = {
   },
 };
 
-// 其他接入方的接口，请勿参考
-export const Api = {
-  async getAccessToken() {
+export const PixsoApi: IServerApi = {
+  async init() {
     const res = await axios.put("/api/user/user/refresh_token", undefined, {
       headers: {
-        authorization: `Bearer ${USER_TOKEN}`,
+        authorization: `Bearer ${PIXSO_TOKEN}`,
       },
     });
     accessToken = res.data.data.access_token;
   },
-  async createFile() {
+  async createFile(name: string) {
     if (!myFolderId) {
       myFolderId = (await InnerApi._getMyFolder())?.id || 0;
     }
@@ -70,7 +69,7 @@ export const Api = {
       {
         description: "File Description",
         folder_id: myFolderId,
-        name: `白板文件-` + Date.now(),
+        name: name || `白板文件-` + Date.now(),
         type: 20,
       },
       {
@@ -79,9 +78,13 @@ export const Api = {
         },
       }
     );
-    return res.data.data as {
+    const data = res.data.data as {
       file_key: string;
       name: string;
+    };
+    return {
+      fileKey: data.file_key,
+      name: data.name,
     };
   },
   async getFileToken(fileKey: string) {
@@ -96,7 +99,7 @@ export const Api = {
     return res.data.data as {
       access_token: string;
       expires_in: number;
-      scope: ("file.edit" | "file.view")[];
+      scope: string;
     };
   },
   async getFileList() {
@@ -117,6 +120,14 @@ export const Api = {
         name: string;
         type: number;
       }[]
-    ).filter((file) => file.type === 20);
+    )
+      .filter((file) => file.type === 20)
+      .map((file) => ({
+        fileKey: file.file_key,
+        name: file.name,
+      }));
+  },
+  async deleteFile(fileKey: string): Promise<void> {
+    // TODO
   },
 };

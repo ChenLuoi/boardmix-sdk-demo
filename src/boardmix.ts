@@ -1,5 +1,5 @@
 import { SDK_ORIGIN } from "./constant";
-import { Api } from "./request";
+import { ServerInstance } from "./server";
 
 export class SdkBoxHelper extends BoardMixSdk {
   // 调用接入方后端提供的接口获取access_token
@@ -7,7 +7,7 @@ export class SdkBoxHelper extends BoardMixSdk {
     token: string;
     expiresIn: number;
   }> {
-    const data = await Api.getFileToken(this.fileKey);
+    const data = await ServerInstance.getFileToken(this.fileKey);
     return {
       token: data.access_token,
       expiresIn: data.expires_in,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { sdkBoxHelper } from "./boardmix";
-import { Api } from "./request";
 import { SDK_ORIGIN } from "./constant";
+import { ServerInstance } from "./server";
 
 const isSdkPrepared = ref(false);
 
@@ -14,10 +14,13 @@ onMounted(async () => {
   // sdkHelper绑定iframe
   sdkBoxHelper.bindIframe(iframeEle.value);
   // 其他介入方接口，请勿参考
-  await Api.getAccessToken();
+  await ServerInstance.setServerType("client");
   // iframe页面准备好后的回调
   sdkBoxHelper.on("PAGE_PREPARED", () => {
     isSdkPrepared.value = true;
+  });
+  sdkBoxHelper.on("SHARE_WITH_CODE", (data) => {
+    console.log(data);
   });
   refreshFileList();
 });
@@ -43,13 +46,44 @@ function exitFile() {
   }
 }
 
+function formatDate(date: Date, fmt = "yyyy-MM-dd hh:mm:ss") {
+  const o = {
+    "M+": date.getMonth() + 1,
+    "d+": date.getDate(),
+    "h+": date.getHours(),
+    "m+": date.getMinutes(),
+    "s+": date.getSeconds(),
+    "q+": Math.floor((date.getMonth() + 3) / 3),
+    S: date.getMilliseconds(),
+  };
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(
+      RegExp.$1,
+      (date.getFullYear() + "").substr(4 - RegExp.$1.length)
+    );
+  }
+  for (const k in o) {
+    if (new RegExp("(" + k + ")").test(fmt)) {
+      fmt = fmt.replace(
+        RegExp.$1,
+        RegExp.$1.length === 1
+          ? "" + o[k]
+          : ("00" + o[k]).substr(("" + o[k]).length)
+      );
+    }
+  }
+  return fmt;
+}
+
 async function onCreateFile() {
   // 其他接入方创建文件接口，请勿参考
-  const file = await Api.createFile();
+  const file = await ServerInstance.createFile(
+    "文件-" + formatDate(new Date())
+  );
   await refreshFileList();
-  fileKey.value = file.file_key;
-  sdkBoxHelper.fileKey = file.file_key;
-  startFile(file.file_key, "editor");
+  fileKey.value = file.fileKey;
+  sdkBoxHelper.fileKey = file.fileKey;
+  startFile(file.fileKey, "editor");
 }
 
 function reEnterFile() {
@@ -58,10 +92,16 @@ function reEnterFile() {
   startFile(fileKey.value, "editor");
 }
 
-const fileList = ref<{ file_key: string; name: string }[]>([]);
+async function deleteFile() {
+  await ServerInstance.deleteFile(fileKey.value);
+  fileKey.value = "";
+  await refreshFileList();
+}
+
+const fileList = ref<FileItem[]>([]);
 
 async function refreshFileList() {
-  fileList.value = await Api.getFileList();
+  fileList.value = await ServerInstance.getFileList();
 }
 
 function onSelect(ev: Event) {
@@ -81,8 +121,8 @@ const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
         @change="onSelect">
         <option
           v-for="file in fileList"
-          :key="file.file_key"
-          :value="file.file_key"
+          :key="file.fileKey"
+          :value="file.fileKey"
         >
           {{ file.name }}
         </option>
@@ -90,11 +130,10 @@ const SDK_APP_PATH = `${SDK_ORIGIN}/app/sdk`;
       <button
         v-if="!isWorking"
         @click="onCreateFile">创建文件</button>
-      <button
-        v-if="!isWorking && fileKey"
-        @click="reEnterFile">
-        再次进入
-      </button>
+      <template v-if="!isWorking && fileKey">
+        <button @click="reEnterFile">再次进入</button>
+        <button @click="deleteFile">删除文件</button>
+      </template>
       <button
         v-if="isWorking"
         @click="exitFile">退出文件</button>

@@ -1,8 +1,6 @@
-import { SDK_ORIGIN } from "../../constant";
+import { CACHE_BASE } from "../../constant";
 
-const url = new URL(SDK_ORIGIN);
-
-const FILE_STORAGE_KEY = `${url.hostname}-files`;
+const FILE_STORAGE_KEY = `${CACHE_BASE}-files`;
 
 export const FileCache = {
   addFile(file: FileItem) {

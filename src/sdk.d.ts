@@ -3,7 +3,8 @@ declare type SdkEventBoxToApp =
   | "START_LOADING"
   | "STOP_LOADING"
   | "SET_ACCESS_TOKEN"
-  | "SET_USER_INFO";
+  | "SET_USER_INFO"
+  | "OPEN_API_INJECT_UI";
 
 type SdkAppEventParams = {
   PAGE_PREPARED: void;
@@ -67,6 +68,10 @@ declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
   }>;
 }
 
+type OptionBase = {
+  clientId?: string;
+};
+
 type OptionName =
   | {
       nameEditable: false;
@@ -109,7 +114,8 @@ type OptionFileUsers = {
     }[]
   >;
 };
-declare type SdkBoxOption = OptionName &
+declare type SdkBoxOption = OptionBase &
+  OptionName &
   OptionShare &
   OptionBack &
   OptionCover &

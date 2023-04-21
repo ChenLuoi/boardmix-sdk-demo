@@ -26,8 +26,14 @@ export const ServerInstance = new (class Server implements IServerApi {
     return this.apiMap[this.type].createFile(name);
   }
 
-  public getFileToken(fileKey: string): Promise<FileTokenInfo> {
-    return this.apiMap[this.type].getFileToken(fileKey);
+  public getFileToken(
+    fileKey: string,
+    user?: {
+      id: number;
+      name: string;
+    }
+  ): Promise<FileTokenInfo> {
+    return this.apiMap[this.type].getFileToken(fileKey, user);
   }
 
   public deleteFile(fileKey: string): Promise<void> {

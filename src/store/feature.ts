@@ -6,7 +6,8 @@ export type FeatureKey =
   | "injectToolbar"
   | "injectBackIcon"
   | "guestMode"
-  | "canEdit";
+  | "canEdit"
+  | "authUser";
 export const FLAG_CACHE_KEY = `${CACHE_BASE}-flags`;
 
 export const useFeatureStore = defineStore("feature", () => {

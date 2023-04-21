@@ -8,11 +8,14 @@ import { storeToRefs } from "pinia";
 
 export function useBoardmix() {
   const sdkBoxHelper = new (class SdkBoxHelper extends BoardMixSdk {
-    protected override async getAccessToken(): Promise<{
+    public override async getAccessToken(): Promise<{
       token: string;
       expiresIn: number;
     }> {
-      const data = await ServerInstance.getFileToken(fileKey.value);
+      const data = await ServerInstance.getFileToken(
+        fileKey.value,
+        flags.value.authUser ? user.value : undefined
+      );
       return {
         token: data.access_token,
         expiresIn: data.expires_in,
@@ -132,7 +135,7 @@ export function useBoardmix() {
     );
   }
 
-  function reloadFile() {
+  async function reloadFile() {
     if (isWorking.value) {
       exitFile();
     }
@@ -140,9 +143,14 @@ export function useBoardmix() {
       return;
     }
     injectUi();
+    let token = undefined;
+    if (flags.value.authUser) {
+      token = (await sdkBoxHelper.getAccessToken()).token;
+    }
     sdkBoxHelper.sendMessage("START_LOADING", {
       fileKey: fileKey.value,
       role: flags.value.canEdit ? "editor" : "viewer",
+      token,
     });
     isWorking.value = true;
   }

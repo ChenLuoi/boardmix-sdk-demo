@@ -11,8 +11,18 @@ interface FileTokenInfo {
 
 interface IServerApi {
   init(): Promise<void>;
+
   createFile(name: string): Promise<FileItem>;
+
   deleteFile(fileKey: string): Promise<void>;
+
   getFileList(): Promise<FileItem[]>;
-  getFileToken(fileKey: string): Promise<FileTokenInfo>;
+
+  getFileToken(
+    fileKey: string,
+    user?: {
+      id: number;
+      name: string;
+    }
+  ): Promise<FileTokenInfo>;
 }

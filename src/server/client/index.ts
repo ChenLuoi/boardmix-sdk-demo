@@ -34,13 +34,20 @@ export const ClientApi: IServerApi = {
     });
     FileCache.removeFile(fileKey);
   },
-  async getFileToken(fileKey: string): Promise<FileTokenInfo> {
+  async getFileToken(
+    fileKey: string,
+    user?: { id: number; name: string }
+  ): Promise<FileTokenInfo> {
     const formData = new FormData();
     formData.set("grant_type", "client_credentials");
     formData.set("file_key", fileKey);
     formData.set("scope", "file.edit file.view");
     formData.set("client_id", CLIENT_ID);
     formData.set("client_secret", CLIENT_SECRET);
+    if (user) {
+      formData.set("user_id", user.id.toString());
+      formData.set("nick_name", user.name);
+    }
     const res = await httpInstance.post("/oauth/token", formData);
     return res.data as {
       access_token: string;

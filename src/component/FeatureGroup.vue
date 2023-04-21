@@ -27,6 +27,10 @@ const featureStore = useFeatureStore();
 
 const featureList: { key: FeatureKey; name: string }[] = [
   {
+    key: "authUser",
+    name: "授权用户",
+  },
+  {
     key: "guestMode",
     name: "匿名模式",
   },

@@ -1,5 +1,4 @@
-# b
-oardmix sdk demo
+# boardmix sdk demo
 
 ## 运行须知
 

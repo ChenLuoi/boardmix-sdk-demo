@@ -25,8 +25,11 @@ export const useFileStore = defineStore("file", () => {
   }
 
   async function removeFile(fileKey: string) {
-    await ServerInstance.deleteFile(fileKey);
-    await refreshFileList();
+    try {
+      await ServerInstance.deleteFile(fileKey);
+    } finally {
+      await refreshFileList();
+    }
   }
 
   function mergeData(files: FileItem[], override = false) {

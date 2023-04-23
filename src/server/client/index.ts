@@ -27,12 +27,12 @@ export const ClientApi: IServerApi = {
     return fileItem;
   },
   async deleteFile(fileKey: string) {
+    FileCache.removeFile(fileKey);
     await httpInstance.delete(`/openapi/v1/file/${fileKey}`, {
       headers: {
         Authorization: `${tokenType} ${accessToken}`,
       },
     });
-    FileCache.removeFile(fileKey);
   },
   async getFileToken(
     fileKey: string,

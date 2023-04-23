@@ -127,7 +127,7 @@ async function onImport() {
           :active-user="userId"
           @on-change="onUserChange" />
         <FeatureGroup @on-change="reloadFile" />
-        <div>
+        <div class="action-group--button-group">
           <button @click="onExport">导出数据</button>
           <button @click="onImport">导入数据</button>
         </div>
@@ -177,9 +177,17 @@ iframe {
   height: 200px;
 }
 
+.action-group--content > * {
+  margin-left: 6px;
+}
+
 .action-group--button-group {
   display: flex;
   flex-direction: column;
+}
+
+.action-group--button-group button {
+  margin-bottom: 8px;
 }
 
 .action-group--anchor {

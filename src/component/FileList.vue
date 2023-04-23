@@ -34,7 +34,7 @@ function onSelect(fileKey: string) {
 
 <style>
 .file-list {
-  width: 200px;
+  width: 240px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;

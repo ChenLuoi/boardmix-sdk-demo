@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { CACHE_BASE } from "../constant";
 
-interface User {
+export interface User {
   id: number;
   name: string;
   avatar: string;
@@ -31,6 +31,10 @@ export const useUserStore = defineStore("user", () => {
   }
 
   function addUser(user: User) {
+    if (userMap.value[user.id]) {
+      console.log("用户重复", user);
+      return;
+    }
     users.value.push(user);
     userMap.value[user.id] = user;
     localStorage.setItem(USER_CACHE_KEY, JSON.stringify(users.value));
@@ -45,11 +49,20 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
+  function mergeData(_users: User[], override = false) {
+    if (override) {
+      users.value.length = 0;
+      userMap.value = {};
+    }
+    _users.forEach(addUser);
+  }
+
   return {
     users,
     userMap,
     updateUsers,
     addUser,
     removeUser,
+    mergeData,
   };
 });

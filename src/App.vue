@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { SDK_BASE } from "./constant";
+import { CACHE_BASE, SDK_BASE } from "./constant";
 import { ServerInstance } from "./server";
 import FileList from "./component/FileList.vue";
 import { useFileStore } from "./store/file";
 import FeatureGroup from "./component/FeatureGroup.vue";
-import { useFeatureStore } from "./store/feature";
+import { FeatureKey, useFeatureStore } from "./store/feature";
 import UserList from "./component/UserList.vue";
-import { useUserStore } from "./store/user";
+import { User, useUserStore } from "./store/user";
 import { useBoardmix } from "./boardmix";
+import { downloadFile, getImportFile } from "./util/file";
 
 const isSdkPrepared = ref(false);
 
@@ -69,6 +70,41 @@ function onUserChange(_userId: number) {
   userId.value = _userId;
   reloadFile();
 }
+
+function onExport() {
+  const cache = {
+    files: fileStore.fileList,
+    users: userStore.users,
+    flags: featureStore.flags,
+  };
+  downloadFile(new Blob([JSON.stringify(cache)]), `${CACHE_BASE}.cache`);
+}
+
+async function onImport() {
+  const file = await getImportFile(".cache");
+  console.log(file.name);
+  const cacheOrigin = file.name.slice(0, file.name.lastIndexOf("."));
+  const next =
+    cacheOrigin !== CACHE_BASE && confirm("服务地址不一致，是否继续");
+  if (!next) {
+    return;
+  }
+  const content = await file.text();
+  const cache = JSON.parse(content) as {
+    files?: FileItem[];
+    users?: User[];
+    flags?: { [key in FeatureKey]?: boolean };
+  };
+  if (cache.flags) {
+    featureStore.mergeData(cache.flags);
+  }
+  if (cache.users) {
+    userStore.mergeData(cache.users);
+  }
+  if (cache.files) {
+    fileStore.mergeData(cache.files);
+  }
+}
 </script>
 <template>
   <div class="container">
@@ -91,6 +127,10 @@ function onUserChange(_userId: number) {
           :active-user="userId"
           @on-change="onUserChange" />
         <FeatureGroup @on-change="reloadFile" />
+        <div>
+          <button @click="onExport">导出数据</button>
+          <button @click="onImport">导入数据</button>
+        </div>
       </div>
       <div class="action-group--anchor">此处下拉</div>
     </div>

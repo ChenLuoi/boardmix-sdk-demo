@@ -1,6 +1,6 @@
 import { CACHE_BASE } from "../../constant";
 
-const FILE_STORAGE_KEY = `${CACHE_BASE}-files`;
+export const FILE_STORAGE_KEY = `${CACHE_BASE}-files`;
 
 export const FileCache = {
   addFile(file: FileItem) {

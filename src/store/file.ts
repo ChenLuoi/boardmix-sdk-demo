@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ServerInstance } from "../server";
 import { ref } from "vue";
 import { formatDate } from "../util/time";
+import { FILE_STORAGE_KEY } from "../server/client/file-cache";
 
 export const useFileStore = defineStore("file", () => {
   const fileList = ref<FileItem[]>([]);
@@ -28,11 +29,26 @@ export const useFileStore = defineStore("file", () => {
     await refreshFileList();
   }
 
+  function mergeData(files: FileItem[], override = false) {
+    if (override) {
+      fileList.value.length = 0;
+      fileMap.value = {};
+    }
+    files.forEach((file) => {
+      if (!fileMap.value[file.fileKey]) {
+        fileList.value.push(file);
+        fileMap.value[file.fileKey] = file;
+      }
+    });
+    localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(fileList.value));
+  }
+
   return {
     fileMap,
     fileList,
     addFile,
     removeFile,
     refreshFileList,
+    mergeData,
   };
 });

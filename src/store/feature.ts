@@ -28,9 +28,14 @@ export const useFeatureStore = defineStore("feature", () => {
     localStorage.setItem(FLAG_CACHE_KEY, JSON.stringify(flags.value));
   }
 
+  function mergeData(_flags: { [key in FeatureKey]?: boolean }) {
+    flags.value = _flags;
+  }
+
   return {
     flags,
     init,
     update,
+    mergeData,
   };
 });

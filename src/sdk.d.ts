@@ -1,39 +1,128 @@
-declare type SdkEventBoxToApp =
-  | "INIT_CONFIG"
-  | "START_LOADING"
-  | "STOP_LOADING"
-  | "SET_ACCESS_TOKEN"
-  | "SET_USER_INFO"
-  | "OPEN_API_INJECT_UI";
+interface ActionToolbar {
+  icon: string;
+  label: string;
+  action: "event" | "expand";
+  key: string;
+}
 
-type SdkAppEventParams = {
+// 可展开的工具栏组
+type ToolbarGroup =
+  | {
+      icon: string;
+      label: string;
+      key: string;
+      action: "group";
+      children: ActionToolbar[];
+    }
+  | ActionToolbar;
+
+declare type SdkEventBoxToApp = {
+  START_LOADING: {
+    fileKey: string;
+    role: "editor" | "viewer";
+    token?: string;
+  };
+  STOP_LOADING: void;
+  OPEN_API_INJECT_UI: {
+    icon?: {
+      headerBack?: string;
+    };
+    toolbar?: ToolbarGroup[];
+  };
+};
+
+/**
+ * Key: [paramType, returnType]
+ */
+declare type SdkPromiseEventAppToBox = {
+  GET_ACCESS_TOKEN: [void, { token: string; expiresIn: number }];
+  GET_USER_INFO: [void, { name: string; avatar: string; userId?: number }];
+  GET_FILE_INFO: [
+    void,
+    {
+      isEditor: boolean;
+      name: string;
+      fileKey: string;
+      loginType?: TargetLoginType;
+    }
+  ];
+  UPDATE_FILE_NAME: [{ name: string }, void];
+  UPDATE_FILE_COVER: [{ data: Blob }, void];
+  UPDATE_FILE_THUMBNAIL: [{ data: Blob }, void];
+  GET_FILE_USERS: [
+    void,
+    {
+      id: number;
+      avatar: string;
+      name: string;
+      mobile?: string;
+      email?: string;
+    }[]
+  ];
+};
+
+type SdkPromiseEventAppToBoxParamDef<
+  T extends keyof SdkPromiseEventAppToBox = keyof SdkPromiseEventAppToBox
+> = {
+  [key: T]: SdkPromiseEventAppToBox[T][0];
+};
+
+declare type SdkEventAppToBox = {
   PAGE_PREPARED: void;
-  GET_ACCESS_TOKEN: void;
-  GET_USER_INFO: void;
-  GET_FILE_INFO: void;
-  UPDATE_FILE_NAME: void;
-  UPDATE_FILE_COVER: void;
-  UPDATE_FILE_THUMBNAIL: void;
   BACK_TO_HOME: void;
   START_SHARE: void;
   REPORT_USER_ACTIVE: void;
   SHARE_WITH_CODE: { nodeId: string };
   REQUEST_LOGIN: void;
-  GET_FILE_USERS: void;
-};
+  OPEN_LINK: void;
+  LOADING_FILE_START: void;
+  LOADING_FILE_SUCCESS: void;
+  LOADING_FILE_FAIL: void;
+  OPEN_API_EVENT_CALLBACK: {
+    type: "board";
+    key: string;
+    guid: string;
+    businessData: string;
+  } & {
+    type: "toolbar";
+    groupKey: string;
+    key: string;
+    position: {
+      left: number;
+      top: number;
+      centerY: number;
+    };
+  };
+  OPEN_API_TOOLBAR_CLOSE: {
+    key: string;
+  };
+  WINDOW_KEY_DOWN: Pick<
+    KeyboardEvent,
+    | "type"
+    | "code"
+    | "altKey"
+    | "composed"
+    | "ctrlKey"
+    | "detail"
+    | "keyCode"
+    | "isComposing"
+    | "key"
+    | "metaKey"
+    | "shiftKey"
+    | "which"
+  >;
+} & SdkPromiseEventAppToBoxParamDef;
 
-declare type SdkEventAppToBox = keyof SdkAppEventParams;
+declare abstract class SdkBase<T, K extends keyof T> {
+  public on(event: K, handler: (params: T[K]) => void);
 
-declare abstract class SdkBase<T extends keyof SdkAppEventParams> {
-  public on(event: T, handler: (params: SdkAppEventParams[T]) => void);
+  public once(event: K, handler: (params: T[K]) => void);
 
-  public once(event: T, handler: (params: SdkAppEventParams[T]) => void);
+  public off(event: K, handler: (params: T[K]) => void);
 
-  public off(event: T, handler: (params: SdkAppEventParams[T]) => void);
+  public removeAllListener(event: K);
 
-  public removeAllListener(event: T);
-
-  public emit(event: T, params: SdkAppEventParams[T]);
+  public emit(event: K, params: T[K]);
 }
 
 declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
@@ -43,9 +132,9 @@ declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
 
   public loadFile(fileKey: string): void;
 
-  public override sendMessage(
-    key: SdkEventBoxToApp,
-    value?: Obj,
+  public override sendMessage<T extends keyof SdkEventBoxToApp>(
+    key: T,
+    value?: SdkEventBoxToApp[T],
     promiseId?: number,
     reply?: boolean
   ): void;
@@ -58,6 +147,7 @@ declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
   protected abstract getUserInfo(): Promise<{
     name: string;
     avatar: string;
+    userId?: number;
   }>;
 
   protected abstract getFileInfo(): Promise<{

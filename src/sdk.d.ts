@@ -29,6 +29,50 @@ declare type SdkEventBoxToApp = {
     };
     toolbar?: ToolbarGroup[];
   };
+  OPEN_API_CREATE: {
+    businessData: string;
+    strokeColor: string;
+    strokeWidth: number;
+    fillColor: string;
+    position?: {
+      x: number;
+      y: number;
+    };
+    contents: (
+      | {
+          type: "image";
+          width: number;
+          height: number;
+          left: number;
+          top: number;
+          imageData: File | Blob;
+        }
+      | {
+          type: "rect";
+          width: number;
+          height: number;
+          left: number;
+          top: number;
+          strokeColor: string;
+          strokeWidth: number;
+          fillColor: string;
+        }
+      | {
+          type: "text";
+          width?: number;
+          left: number;
+          top: number;
+          textInfo: {
+            textContent: string;
+            textForeground?: string;
+            textBackground?: string;
+            fontSize?: number;
+            "font-weight"?: string;
+            "line-height"?: number;
+          }[];
+        }
+    )[];
+  };
 };
 
 /**
@@ -74,25 +118,27 @@ declare type SdkEventAppToBox = {
   REPORT_USER_ACTIVE: void;
   SHARE_WITH_CODE: { nodeId: string };
   REQUEST_LOGIN: void;
-  OPEN_LINK: void;
+  OPEN_LINK: { url: string };
   LOADING_FILE_START: void;
   LOADING_FILE_SUCCESS: void;
   LOADING_FILE_FAIL: void;
-  OPEN_API_EVENT_CALLBACK: {
-    type: "board";
-    key: string;
-    guid: string;
-    businessData: string;
-  } & {
-    type: "toolbar";
-    groupKey: string;
-    key: string;
-    position: {
-      left: number;
-      top: number;
-      centerY: number;
-    };
-  };
+  OPEN_API_EVENT_CALLBACK:
+    | {
+        type: "board";
+        key: string;
+        guid: string;
+        businessData: string;
+      }
+    | {
+        type: "toolbar";
+        groupKey: string;
+        key: string;
+        position: {
+          left: number;
+          top: number;
+          centerY: number;
+        };
+      };
   OPEN_API_TOOLBAR_CLOSE: {
     key: string;
   };
@@ -113,24 +159,31 @@ declare type SdkEventAppToBox = {
   >;
 } & SdkPromiseEventAppToBoxParamDef;
 
-declare abstract class SdkBase<T, K extends keyof T> {
-  public on(event: K, handler: (params: T[K]) => void);
+declare abstract class SdkBase<T> {
+  public on<K extends keyof T = keyof T>(
+    event: K,
+    handler: (params: T[K]) => void
+  );
 
-  public once(event: K, handler: (params: T[K]) => void);
+  public once<K extends keyof T = keyof T>(
+    event: K,
+    handler: (params: T[K]) => void
+  );
 
-  public off(event: K, handler: (params: T[K]) => void);
+  public off<K extends keyof T = keyof T>(
+    event: K,
+    handler: (params: T[K]) => void
+  );
 
-  public removeAllListener(event: K);
+  public removeAllListener<K extends keyof T = keyof T>(event: K);
 
-  public emit(event: K, params: T[K]);
+  public emit<K extends keyof T = keyof T>(event: K, params: T[K]);
 }
 
 declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
   constructor(origin: string, option: SdkBoxOption);
 
   public bindIframe(iframeEle: HTMLIFrameElement): void;
-
-  public loadFile(fileKey: string): void;
 
   public override sendMessage<T extends keyof SdkEventBoxToApp>(
     key: T,

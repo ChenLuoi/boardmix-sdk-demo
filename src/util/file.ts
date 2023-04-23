@@ -1,5 +1,3 @@
-import { File } from "buffer";
-
 export function downloadFile(
   data: Blob,
   fileName = "file",

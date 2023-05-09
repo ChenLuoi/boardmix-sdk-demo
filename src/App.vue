@@ -46,6 +46,9 @@ onMounted(async () => {
   sdkBoxHelper.on("SHARE_WITH_CODE", (data) => {
     console.log(data);
   });
+  sdkBoxHelper.on("COPY_EMBED", (data) => {
+    console.log("COPY_EMBED", data);
+  });
   initFeature();
   updateUsers();
   await refreshFileList();
@@ -84,11 +87,10 @@ async function onImport() {
   const file = await getImportFile(".cache");
   console.log(file.name);
   const cacheOrigin = file.name.slice(0, file.name.lastIndexOf("."));
-  const next =
-    cacheOrigin !== CACHE_BASE && confirm("服务地址不一致，是否继续");
-  if (!next) {
+  if (cacheOrigin !== CACHE_BASE && !confirm("服务地址不一致，是否继续")) {
     return;
   }
+
   const content = await file.text();
   const cache = JSON.parse(content) as {
     files?: FileItem[];

@@ -54,7 +54,7 @@
       {
         "semi": true,
         "useTabs": false,
-        "tabWidth": 2
+        "tabWidth": 4
       }
     ],
     "vue/max-attributes-per-line": [

@@ -4,27 +4,27 @@ import { viteHtmlVariables } from "./plugin/vite-html-variables";
 
 // https://vitejs.dev/config/
 export default defineConfig((config) => {
-  const env = loadEnv(config.mode, process.cwd());
-  return {
-    server: {
-      port: 23333,
-      proxy: {
-        "/api": {
-          target: env.VITE_PIXSO_ORIGIN,
-          changeOrigin: true,
+    const env = loadEnv(config.mode, process.cwd());
+    return {
+        server: {
+            port: 23333,
+            proxy: {
+                "/api": {
+                    target: env.VITE_PIXSO_ORIGIN,
+                    changeOrigin: true,
+                },
+                "/openapi": {
+                    target: env.VITE_PIXSO_ORIGIN,
+                    changeOrigin: true,
+                },
+            },
         },
-        "/openapi": {
-          target: env.VITE_PIXSO_ORIGIN,
-          changeOrigin: true,
-        },
-      },
-    },
-    plugins: [
-      vue(),
-      viteHtmlVariables({
-        $SDK_ORIGIN: env.VITE_SDK_ORIGIN,
-        $SDK_BASE: env.VITE_SDK_BASE,
-      }),
-    ],
-  };
+        plugins: [
+            vue(),
+            viteHtmlVariables({
+                $SDK_ORIGIN: env.VITE_SDK_ORIGIN,
+                $SDK_BASE: env.VITE_SDK_BASE,
+            }),
+        ],
+    };
 });

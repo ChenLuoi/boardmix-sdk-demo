@@ -1,4 +1,4 @@
 interface IFeature {
-  open(): void;
-  close(): void;
+    open(): void;
+    close(): void;
 }

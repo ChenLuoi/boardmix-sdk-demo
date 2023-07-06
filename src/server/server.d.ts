@@ -25,4 +25,6 @@ interface IServerApi {
       name: string;
     }
   ): Promise<FileTokenInfo>;
+  startGroupWork(fileKey: string): Promise<void>;
+  stopGroupWork(fileKey: string): Promise<void>;
 }

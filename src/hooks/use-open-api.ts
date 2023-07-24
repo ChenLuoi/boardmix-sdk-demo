@@ -93,6 +93,7 @@ export const useOpenApi = (client: BoardMixSdk) => {
                 userId: 232332,
             }),
             position,
+			customType: "customElement1"
         });
     };
 
@@ -252,11 +253,46 @@ export const useOpenApi = (client: BoardMixSdk) => {
             ],
         });
     };
+
+    const createChart = () => {
+        client.sendMessage("OPEN_API_CREATE_NATIVE_ELEMENT", {
+            type: "chart",
+            data: {
+                formData: {
+                    itemType: 6,
+                    data: [
+                        {
+                            label: "用户",
+                            value: 100,
+                            color: 898545,
+                        },
+                        {
+                            label: "用户2",
+                            value: 200,
+                            color: 121212,
+                        },
+                        {
+                            label: "用户3",
+                            value: 2000,
+                            color: 545645,
+                        },
+                    ],
+                    config: {
+                        showLabel: true,
+                        showValue: false,
+                        radius: "50px",
+                    },
+                },
+                color: 222222,
+            }
+        });
+    };
     return {
         importData,
         multipleImportData,
         replaceImage,
         classifyData,
-		createText
+        createText,
+        createChart,
     };
 };

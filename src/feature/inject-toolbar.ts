@@ -43,6 +43,10 @@ export function useInjectToolbar(helper: BoardMixSdk): IFeature {
                             },
                             color: 222222,
                         },
+						position: {
+							y: 300,
+							x: 300
+						}
                     });
                     break;
                 case "inject-tool-expand":

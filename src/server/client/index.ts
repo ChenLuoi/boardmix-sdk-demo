@@ -1,6 +1,7 @@
 import { httpInstance } from "./http";
 import { CLIENT_ID, CLIENT_SECRET } from "../../constant";
 import { FileCache } from "./file-cache";
+import { useFeatureStore } from "../../store/feature";
 
 const tokenType = "Bearer";
 let accessToken = "";
@@ -38,10 +39,14 @@ export const ClientApi: IServerApi = {
     fileKey: string,
     user?: { id: number; name: string }
   ): Promise<FileTokenInfo> {
+    const featureStore = useFeatureStore();
     const formData = new FormData();
     formData.set("grant_type", "client_credentials");
     formData.set("file_key", fileKey);
-    formData.set("scope", "file.edit file.view");
+    formData.set(
+      "scope",
+      featureStore.flags.canEdit ? "file.view file.edit" : "file.view"
+    );
     formData.set("client_id", CLIENT_ID);
     formData.set("client_secret", CLIENT_SECRET);
     if (user) {
@@ -70,5 +75,29 @@ export const ClientApi: IServerApi = {
       token_type: string;
     };
     accessToken = data.access_token;
+  },
+  async startGroupWork(key: string) {
+    const res = await httpInstance.post(
+      `/openapi/v1/group/file/${key}/group/outer_start`,
+      {
+        lock: false,
+        user_id: 123,
+      },
+      {
+        headers: {
+          Authorization: `${tokenType} ${accessToken}`,
+        },
+      }
+    );
+  },
+  async stopGroupWork(key: string) {
+    const res = await httpInstance.delete(
+      `/openapi/v1/group/file/${key}/group/outer_end`,
+      {
+        headers: {
+          Authorization: `${tokenType} ${accessToken}`,
+        },
+      }
+    );
   },
 };

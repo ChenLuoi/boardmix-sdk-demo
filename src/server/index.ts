@@ -39,4 +39,11 @@ export const ServerInstance = new (class Server implements IServerApi {
   public deleteFile(fileKey: string): Promise<void> {
     return this.apiMap[this.type].deleteFile(fileKey);
   }
+
+  startGroupWork(fileKey: string): Promise<void> {
+    return this.apiMap[this.type].startGroupWork(fileKey);
+  }
+  stopGroupWork(fileKey: string): Promise<void> {
+    return this.apiMap[this.type].stopGroupWork(fileKey);
+  }
 })();

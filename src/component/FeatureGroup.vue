@@ -20,7 +20,7 @@
 import { FeatureKey, useFeatureStore } from "../store/feature";
 
 const emit = defineEmits<{
-  (e: "on-change");
+  (e: "on-change"): void;
 }>();
 
 const featureStore = useFeatureStore();
@@ -48,7 +48,7 @@ const featureList: { key: FeatureKey; name: string }[] = [
   },
 ];
 
-function onChange(event: InputEvent, key: FeatureKey) {
+function onChange(event: Event, key: FeatureKey) {
   featureStore.update(
     key,
     !!(event.target as unknown as { checked: boolean } | undefined)?.checked

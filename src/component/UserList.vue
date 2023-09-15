@@ -23,7 +23,7 @@ defineProps<{
   activeUser: number;
 }>();
 
-const emit = defineEmits<{ (e: "on-change", userId: number) }>();
+const emit = defineEmits<{ (e: "on-change", userId: number): void }>();
 
 const userStore = useUserStore();
 const users = computed(() => userStore.users);

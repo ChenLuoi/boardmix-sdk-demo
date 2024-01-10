@@ -28,15 +28,20 @@ export const ServerInstance = new (class Server implements IServerApi {
 
   public getFileToken(
     fileKey: string,
+    isEditor: boolean,
     user?: {
       id: number;
       name: string;
     }
   ): Promise<FileTokenInfo> {
-    return this.apiMap[this.type].getFileToken(fileKey, user);
+    return this.apiMap[this.type].getFileToken(fileKey, isEditor, user);
   }
 
   public deleteFile(fileKey: string): Promise<void> {
     return this.apiMap[this.type].deleteFile(fileKey);
+  }
+
+  public updateFileName(fileKey: string, name: string): Promise<void> {
+    return this.apiMap[this.type].updateFileName(fileKey, name);
   }
 })();

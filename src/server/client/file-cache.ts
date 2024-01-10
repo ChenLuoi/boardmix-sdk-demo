@@ -34,4 +34,12 @@ export const FileCache = {
     }
     return files;
   },
+  renameFile(fileKey: string, name: string) {
+    const files = this.getFileList();
+    const item = files.find((file) => file.fileKey === fileKey);
+    if (item) {
+      item.name = name;
+      localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(files));
+    }
+  },
 };

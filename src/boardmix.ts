@@ -16,6 +16,7 @@ export function useBoardmix() {
     }> {
       const data = await ServerInstance.getFileToken(
         fileKey.value,
+        !!flags.value.canEdit,
         flags.value.authUser ? user.value : undefined
       );
       return {

@@ -36,12 +36,13 @@ export const ClientApi: IServerApi = {
   },
   async getFileToken(
     fileKey: string,
+    isEditor: boolean,
     user?: { id: number; name: string }
   ): Promise<FileTokenInfo> {
     const formData = new FormData();
     formData.set("grant_type", "client_credentials");
     formData.set("file_key", fileKey);
-    formData.set("scope", "file.edit file.view");
+    formData.set("scope", isEditor ? "file.edit file.view" : "file.view");
     formData.set("client_id", CLIENT_ID);
     formData.set("client_secret", CLIENT_SECRET);
     if (user) {
@@ -70,5 +71,8 @@ export const ClientApi: IServerApi = {
       token_type: string;
     };
     accessToken = data.access_token;
+  },
+  async updateFileName(fileKey: string, name: string) {
+    FileCache.renameFile(fileKey, name);
   },
 };

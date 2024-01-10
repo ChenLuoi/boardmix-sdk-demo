@@ -46,6 +46,14 @@ export const useFileStore = defineStore("file", () => {
     localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify(fileList.value));
   }
 
+  async function updateFileName(fileKey: string, name: string) {
+    const file = fileMap.value[fileKey];
+    if (file) {
+      await ServerInstance.updateFileName(fileKey, name);
+      file.name = name;
+    }
+  }
+
   return {
     fileMap,
     fileList,
@@ -53,5 +61,6 @@ export const useFileStore = defineStore("file", () => {
     removeFile,
     refreshFileList,
     mergeData,
+    updateFileName,
   };
 });

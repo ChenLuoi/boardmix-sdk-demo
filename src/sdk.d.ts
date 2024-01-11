@@ -16,11 +16,66 @@ type ToolbarGroup =
     }
   | ActionToolbar;
 
+type InjectFloatToolItem = {
+  icon: string;
+  tips?: string;
+  key: string;
+  type: "single" | "multiple";
+  supportElements?: string[];
+} & (
+  | { action: "event" | Func }
+  | {
+      action: "group";
+      children: InjectFloatToolChildItem[];
+    }
+);
+
+type CustomElement = {
+  icon: string;
+  name: string;
+  key: string;
+};
+
+type AiUpgradeUI = {
+  upgradeText: string;
+  upgradeIcon: string;
+  pointText: string;
+  pointTips: string;
+  pointIcon: string;
+};
+
+type FeatureOperation = 0 | 1 | 2;
+
+interface FeatureConfig {
+  export: boolean;
+  exportBdx: boolean;
+  embedEnable: boolean;
+  groupWork: false | "NORMAL" | "CONTROLLED";
+  helpCenter: boolean;
+  userConduct: boolean;
+  feedback: boolean;
+  changelog: FeatureOperation;
+  shortcutPanel: boolean;
+  shortcutDoc: FeatureOperation;
+  downloadClient: boolean;
+  reportFile: boolean;
+  instructions: boolean;
+  presentationMode: "normal" | "force";
+  videoConferencing: boolean;
+}
+
 declare type SdkEventBoxToApp = {
   START_LOADING: {
     fileKey: string;
     role: "editor" | "viewer";
     token?: string;
+    thumbConfig?: {
+      mode?: "debounce" | "throttle";
+      // debounce 最后一次修改{interval}时间后，提交缩略图，中间每次修改都会导致计时重置
+      // throttle 首次修改后{interval}时间后，提交缩略图，中间每次修改都会被忽略
+      interval?: number; // 等待时间，单位毫秒
+      emitOnStart?: true; // 是否在文件打开时提交一次缩略图
+    };
   };
   STOP_LOADING: void;
   OPEN_API_INJECT_UI: {
@@ -28,6 +83,19 @@ declare type SdkEventBoxToApp = {
       headerBack?: string;
     };
     toolbar?: ToolbarGroup[];
+    tutorialList?: {
+      title: string;
+      list: {
+        content: string;
+        cover: string;
+        title: string;
+      }[];
+    }[];
+    floatToolbar?: InjectFloatToolItem[];
+    leftHeader?: CustomElement[];
+    customElements?: CustomElement[];
+    aiUpgradeUI?: AiUpgradeUI | boolean;
+    loadingVersion?: "v1";
   };
   OPEN_API_CREATE: {
     businessData: string;
@@ -72,6 +140,11 @@ declare type SdkEventBoxToApp = {
           }[];
         }
     )[];
+  };
+  SET_FEATURE_CONFIG: Partial<FeatureConfig>;
+  UPDATE_FILE_NAME: { name: string };
+  TRIGGER_ACTION: {
+    action: "airdrop" | "open-history";
   };
 };
 

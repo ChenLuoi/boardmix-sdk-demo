@@ -10,6 +10,7 @@ import UserList from "./component/UserList.vue";
 import { User, useUserStore } from "./store/user";
 import { useBoardmix } from "./boardmix";
 import { downloadFile, getImportFile } from "./util/file";
+import { formatDate } from "./util/time";
 
 const isSdkPrepared = ref(false);
 
@@ -42,6 +43,9 @@ onMounted(async () => {
   // iframe页面准备好后的回调
   sdkBoxHelper.on("PAGE_PREPARED", () => {
     isSdkPrepared.value = true;
+    sdkBoxHelper.sendMessage("SET_FEATURE_CONFIG", {
+      helpCenter: true,
+    });
   });
   sdkBoxHelper.on("SHARE_WITH_CODE", (data) => {
     console.log(data);
@@ -57,6 +61,14 @@ async function onCreateFile() {
   const file = await addFile();
   fileKey.value = file.fileKey;
   loadFile(file.fileKey);
+}
+
+async function renameFile() {
+  const newName = "文件-" + formatDate(new Date(), "MM-dd hh:mm:ss");
+  await fileStore.updateFileName(fileKey.value, newName);
+  if (isWorking) {
+    sdkBoxHelper.sendMessage("UPDATE_FILE_NAME", { name: newName });
+  }
 }
 
 async function deleteFile() {
@@ -105,38 +117,39 @@ async function onImport() {
     fileStore.mergeData(cache.files);
   }
 }
+
+function onAirdrop() {
+  sdkBoxHelper.sendMessage("TRIGGER_ACTION", { action: "airdrop" });
+}
+
+function onHistory() {
+  sdkBoxHelper.sendMessage("TRIGGER_ACTION", { action: "open-history" });
+}
 </script>
 <template>
   <div class="container">
     <div class="action-group">
       <div class="action-group--content">
-        <FileList
-          :file-key="fileKey"
-          @on-change="loadFile" />
+        <FileList :file-key="fileKey" @on-change="loadFile" />
         <div class="action-group--button-group">
           <button @click="reloadFile">进入文件</button>
           <button @click="onCreateFile">创建文件</button>
-          <button
-            v-if="fileKey"
-            @click="deleteFile">删除文件</button>
-          <button
-            v-if="isWorking"
-            @click="exitFile">退出文件</button>
+          <button v-if="fileKey" @click="renameFile">重命名文件</button>
+          <button v-if="fileKey" @click="deleteFile">删除文件</button>
+          <button v-if="isWorking" @click="exitFile">退出文件</button>
         </div>
-        <UserList
-          :active-user="userId"
-          @on-change="onUserChange" />
+        <UserList :active-user="userId" @on-change="onUserChange" />
         <FeatureGroup @on-change="reloadFile" />
         <div class="action-group--button-group">
           <button @click="onExport">导出数据</button>
           <button @click="onImport">导入数据</button>
+          <button @click="onAirdrop">唤起扫码</button>
+          <button @click="onHistory">历史版本</button>
         </div>
       </div>
       <div class="action-group--anchor">此处下拉</div>
     </div>
-    <iframe
-      ref="iframeEle"
-      :src="SDK_APP_PATH" />
+    <iframe ref="iframeEle" :src="SDK_APP_PATH" />
   </div>
 </template>
 

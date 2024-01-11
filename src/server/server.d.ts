@@ -20,9 +20,12 @@ interface IServerApi {
 
   getFileToken(
     fileKey: string,
+    isEditor: boolean,
     user?: {
       id: number;
       name: string;
     }
   ): Promise<FileTokenInfo>;
+
+  updateFileName(fileKey: string, name: string): Promise<void>;
 }

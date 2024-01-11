@@ -130,4 +130,7 @@ export const PixsoApi: IServerApi = {
   async deleteFile(fileKey: string): Promise<void> {
     // TODO
   },
+  async updateFileName(fileKey: string, name: string) {
+    // TODO
+  },
 };

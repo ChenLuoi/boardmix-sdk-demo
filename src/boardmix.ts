@@ -115,6 +115,7 @@ export function useBoardmix() {
       fileKey: fileKey.value,
       role: flags.value.canEdit ? "editor" : "viewer",
       token,
+      isSimple: true,
     });
     isWorking.value = true;
   }

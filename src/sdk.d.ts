@@ -69,6 +69,7 @@ declare type SdkEventBoxToApp = {
     fileKey: string;
     role: "editor" | "viewer";
     token?: string;
+    isSimple?: boolean; // 是否JD临时屏蔽版本
     thumbConfig?: {
       mode?: "debounce" | "throttle";
       // debounce 最后一次修改{interval}时间后，提交缩略图，中间每次修改都会导致计时重置
@@ -96,6 +97,13 @@ declare type SdkEventBoxToApp = {
     customElements?: CustomElement[];
     aiUpgradeUI?: AiUpgradeUI | boolean;
     loadingVersion?: "v1";
+    // 注入外部字体
+    appendFonts?: {
+      name: string; // 字体的展示名称，当不存在icon时，预览会直接展示name的文本
+      fontFamily: string; // 字体名font-family
+      data: string | Uint8Array; // 字体数据，支持url或二进制流，当为url的时候，需要接入方处理资源跨域
+      icon?: string; // 字体预览图片，支持base64图片或者url，当为url的时候，需要接入方处理资源跨域
+    }[];
   };
   OPEN_API_CREATE: {
     businessData: string;

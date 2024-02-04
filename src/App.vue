@@ -41,10 +41,30 @@ onMounted(async () => {
   // 其他介入方接口，请勿参考
   await ServerInstance.setServerType("client");
   // iframe页面准备好后的回调
-  sdkBoxHelper.on("PAGE_PREPARED", () => {
+  sdkBoxHelper.on("PAGE_PREPARED", async () => {
     isSdkPrepared.value = true;
     sdkBoxHelper.sendMessage("SET_FEATURE_CONFIG", {
       helpCenter: true,
+    });
+    const fontRes = await fetch(
+      `${location.origin}/fonts/MaoKenWangFengYaSong.ttf`
+    );
+    const fontData = new Uint8Array(await fontRes.arrayBuffer());
+    sdkBoxHelper.sendMessage("OPEN_API_INJECT_UI", {
+      loadingVersion: "v1",
+      appendFonts: [
+        {
+          name: "猫啃风雅颂",
+          fontFamily: "MaoKenFengYaSong",
+          data: fontData,
+          icon: `${location.origin}/images/maoken.png`,
+        },
+        {
+          name: "斗鱼追光体",
+          fontFamily: "DOUYU Font",
+          data: `${location.origin}/fonts/douyuFont-2.otf`,
+        },
+      ],
     });
   });
   sdkBoxHelper.on("SHARE_WITH_CODE", (data) => {

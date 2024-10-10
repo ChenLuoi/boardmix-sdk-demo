@@ -119,6 +119,13 @@ export function useBoardmix() {
     isWorking.value = true;
   }
 
+  function openApiRequest<T extends keyof IOpenApi>(params: {
+    funcName: T;
+    options: Parameters<IOpenApi[T]>[0];
+  }): Promise<ReturnType<IOpenApi[T]>> {
+    return sdkBoxHelper.promisePostMessage("OPEN_API_EXECUTER", params);
+  }
+
   return {
     isWorking,
     loadFile,
@@ -127,5 +134,6 @@ export function useBoardmix() {
     fileKey,
     userId,
     sdkBoxHelper,
+    openApiRequest,
   };
 }

@@ -146,6 +146,26 @@ declare type SdkEventBoxToApp = {
   TRIGGER_ACTION: {
     action: "airdrop" | "open-history";
   };
+  OPEN_API_EXECUTER: {
+    funcName: keyof IOpenApi;
+    options: Parameters[IOpenApi[keyof IOpenApi]][0];
+  };
+} & SdkPromiseEventAppToBoxParamDef;
+
+declare interface SdkPromiseEventBoxToApp {
+  OPEN_API_EXECUTER: [
+    {
+      funcName: keyof IOpenApi;
+      options: Parameters[IOpenApi[keyof IOpenApi]][0];
+    },
+    ReturnType[IOpenApi[keyof IOpenApi]]
+  ];
+}
+
+type SdkPromiseEventBoxToAppParamDef<
+  T extends keyof SdkPromiseEventBoxToApp = keyof SdkPromiseEventBoxToApp
+> = {
+  [key: T]: SdkPromiseEventBoxToApp[T][0];
 };
 
 /**
@@ -257,6 +277,18 @@ declare abstract class BoardMixSdk extends SdkBase<SdkEventAppToBox> {
   constructor(origin: string, option: SdkBoxOption);
 
   public bindIframe(iframeEle: HTMLIFrameElement): void;
+
+  public promisePostMessage<
+    T extends keyof SdkPromiseEventBoxToApp,
+    U extends SdkPromiseEventBoxToApp[T][0],
+    V extends SdkPromiseEventBoxToApp[T][1]
+  >(
+    key: T,
+    value?: U,
+    param?: {
+      timeout?: number;
+    }
+  ): Promise<V>;
 
   public override sendMessage<T extends keyof SdkEventBoxToApp>(
     key: T,

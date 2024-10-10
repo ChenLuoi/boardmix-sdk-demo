@@ -33,6 +33,7 @@ const {
   reloadFile,
   exitFile,
   isWorking,
+  openApiRequest,
 } = useBoardmix();
 
 onMounted(async () => {
@@ -125,6 +126,43 @@ function onAirdrop() {
 function onHistory() {
   sdkBoxHelper.sendMessage("TRIGGER_ACTION", { action: "open-history" });
 }
+
+async function onAddMM() {
+  const result = await Promise.all([
+    openApiRequest({
+      funcName: "createMM",
+      options: {
+        content: "测试",
+      },
+    }),
+    openApiRequest({
+      funcName: "createMM",
+      options: {
+        content: "节点1",
+      },
+    }),
+    openApiRequest({
+      funcName: "createMM",
+      options: {
+        content: "节点2",
+      },
+    }),
+  ]);
+  const [item, child1, child2] = result;
+  openApiRequest({
+    funcName: "MMAddSub",
+    options: {
+      superID: item.guid,
+      subIDs: [child1.guid, child2.guid],
+    },
+  });
+  openApiRequest({
+    funcName: "zoomTo",
+    options: {
+      guids: result.map((item) => item.guid),
+    },
+  });
+}
 </script>
 <template>
   <div class="container">
@@ -145,6 +183,7 @@ function onHistory() {
           <button @click="onImport">导入数据</button>
           <button @click="onAirdrop">唤起扫码</button>
           <button @click="onHistory">历史版本</button>
+          <button @click="onAddMM">创建图元</button>
         </div>
       </div>
       <div class="action-group--anchor">此处下拉</div>

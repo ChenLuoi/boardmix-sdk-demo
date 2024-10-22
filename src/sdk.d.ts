@@ -79,10 +79,12 @@ declare type SdkEventBoxToApp = {
   };
   STOP_LOADING: void;
   OPEN_API_INJECT_UI: {
+    // 支持替换的图标
     icon?: {
-      headerBack?: string;
+      headerBack?: string; // 左侧返回按钮
     };
-    toolbar?: ToolbarGroup[];
+    toolbar?: ToolbarGroup[]; // 菜单栏注入
+    // 帮助中心用户指引注入
     tutorialList?: {
       title: string;
       list: {
@@ -91,11 +93,18 @@ declare type SdkEventBoxToApp = {
         title: string;
       }[];
     }[];
-    floatToolbar?: InjectFloatToolItem[];
+    floatToolbar?: InjectFloatToolItem[]; // 浮动菜单栏注入
     leftHeader?: CustomElement[];
     customElements?: CustomElement[];
     aiUpgradeUI?: AiUpgradeUI | boolean;
-    loadingVersion?: "v1";
+    loadingVersion?: "v1"; // 加载动画注入，v1为不带品牌标识
+    theme?: "light" | "dark" // 亮色/暗色主题，默认为亮色
+    // 模板中心品牌标识替换
+    brandInfo?: {
+	    hideBrand: boolean; // 是否需要替换boardmix品牌
+	    brandName: string; // 品牌名称
+	    logo: string; // 品牌logo
+    };
   };
   OPEN_API_CREATE: {
     businessData: string;

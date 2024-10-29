@@ -7,11 +7,11 @@ export default defineConfig((config) => {
   const env = loadEnv(config.mode, process.cwd());
   const baseProxy = {
     "/api": {
-      target: env.VITE_PIXSO_ORIGIN,
+      target: env.VITE_SDK_ORIGIN,
       changeOrigin: true,
     },
     "/openapi": {
-      target: env.VITE_PIXSO_ORIGIN,
+      target: env.VITE_SDK_ORIGIN,
       changeOrigin: true,
     },
   };
